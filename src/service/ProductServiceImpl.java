@@ -93,7 +93,7 @@ public class ProductServiceImpl implements ProductService {
         statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
 
-        int resultSet = statement.executeUpdate(sql);
+        int resultSet = statement.executeUpdate();
         System.out.println("it's work" + resultSet);
 
         statement.close();
@@ -110,15 +110,16 @@ public class ProductServiceImpl implements ProductService {
 
         statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
-        ResultSet resultSet = statement.executeQuery(sql);
 
+        ResultSet resultSet = statement.executeQuery();
         Product product = new Product();
-        product.setId(resultSet.getInt("id"));
-        product.setCode(resultSet.getString("code"));
-        product.setName(resultSet.getString("name"));
-        product.setPrice(resultSet.getFloat("price"));
-        product.setCategory_id(resultSet.getInt("category_id"));
-
+        while (resultSet.next()) {
+            product.setId(resultSet.getInt("id"));
+            product.setCode(resultSet.getString("code"));
+            product.setName(resultSet.getString("name"));
+            product.setPrice(resultSet.getFloat("price"));
+            product.setCategory_id(resultSet.getInt("category_id"));
+        }
         resultSet.close();
         statement.close();
         connection.close();
@@ -128,6 +129,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void update(int id, Product product) throws ClassNotFoundException, SQLException {
+        PreparedStatement statement = null;
+        Connection connection = connection();
 
+        String sql;
+        sql = "UPDATE products SET code = ?, name = ?, price = ?, category_id = ? WHERE id = ?";
+
+        statement = connection.prepareStatement(sql);
+        statement.setString(1, product.getCode());
+        statement.setString(2, product.getName());
+        statement.setFloat(3, product.getPrice());
+        statement.setInt(4, product.getCategory_id());
+        statement.setInt(5, id);
+
+        int resultSet = statement.executeUpdate();
+        System.out.println("it's work?" + resultSet);
+
+        statement.close();
+        connection.close();
     }
 }
